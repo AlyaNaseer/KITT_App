@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">KITT</string>
+    <string name="voicebox">voicebox</string>
+    <string name="s2">s2</string>
+    <string name="p3">p3</string>
+    <string name="p4">p4</string>
+    <string name="s1">s1</string>
+    <string name="auto">auto</string>
+    <string name="normal">normal</string>
+    <string name ="p2">p2</string>
+    <string name="air">air</string>
+    <string name ="p1">p1</string>
+    <string name="pursuit">pursuit</string>
+    <string name="oil">oil</string>
+
+</resources>

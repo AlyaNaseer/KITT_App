@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".MainActivity"
+    android:gravity="center_vertical">
+
+   <ImageView
+       android:layout_width="128dp"
+       android:layout_height="237dp"
+       android:layout_centerHorizontal="true"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:contentDescription="@string/voicebox"
+       android:scaleType="centerCrop"
+       android:src="@drawable/voicebox"
+
+       />
+
+   <ImageButton
+       android:id="@+id/air"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="7dp"
+       android:layout_marginLeft="7dp"
+       android:layout_marginTop="80dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:contentDescription="@string/oil"
+       android:src="@drawable/air_button"  />
+
+
+   <ImageButton
+       android:id="@+id/oil"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="7dp"
+       android:layout_marginLeft="7dp"
+       android:layout_marginTop="180dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:contentDescription="@string/oil"
+       android:scaleType="centerCrop"
+       android:src="@drawable/oil_button" />
+
+   <ImageButton
+       android:id="@+id/p1"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="7dp"
+       android:layout_marginLeft="7dp"
+       android:layout_marginTop="280dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:contentDescription="@string/p1"
+       android:scaleType="centerCrop"
+       android:src="@drawable/p1_button"  />
+
+   <ImageButton
+       android:id="@+id/p2"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_marginLeft="7dp"
+       android:layout_marginTop="380dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/p2_button"
+       android:contentDescription="@string/p2"
+       android:layout_marginStart="7dp" />
+
+   <ImageButton
+       android:id="@+id/s1"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_marginRight="7dp"
+       android:layout_marginEnd="7dp"
+       android:layout_marginTop="80dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/s1_button"
+       android:contentDescription="@string/s1"
+       android:layout_alignParentRight="true"/>
+
+   <ImageButton
+       android:id="@+id/s2"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="7dp"
+       android:layout_marginEnd="7dp"
+       android:layout_marginTop="180dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/s2_button"
+       android:contentDescription="@string/s2" />
+
+
+   <ImageButton
+       android:id="@+id/p3"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="7dp"
+       android:layout_marginEnd="7dp"
+       android:layout_marginTop="280dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/p3_button"
+       android:contentDescription="@string/p3" />
+
+
+   <ImageButton
+       android:id="@+id/p4"
+       android:layout_width="80dp"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_marginRight="7dp"
+       android:layout_marginEnd="7dp"
+       android:layout_marginTop="380dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/p4_button"
+       android:contentDescription="@string/p4"/>
+
+   <ImageButton
+       android:id="@+id/auto"
+       android:layout_width="171dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="270dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/auto_cruise_button"
+       android:contentDescription="@string/auto" />
+
+   <ImageButton
+       android:id="@+id/normal"
+       android:layout_width="171dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="340dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/normal_cruise_button"
+       android:contentDescription="@string/normal" />
+
+   <ImageButton
+       android:id="@+id/pursuit"
+       android:layout_width="171dp"
+       android:layout_height="wrap_content"
+       android:layout_centerHorizontal="true"
+       android:layout_marginTop="410dp"
+       android:adjustViewBounds="true"
+       android:background="@null"
+       android:scaleType="centerCrop"
+       android:src="@drawable/pursuit_button"
+       android:contentDescription="@string/pursuit"/>
+
+
+</RelativeLayout>
