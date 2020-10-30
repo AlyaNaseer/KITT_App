@@ -2,8 +2,16 @@ package com.example.myapplication;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,22 +22,23 @@ import java.io.IOException;
 import android.media.MediaPlayer;
 import android.content.Intent;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener{
 
     ImageButton AirButton, OilButton, S1Button, S2Button, P1Button, P2Button, P3Button, P4Button, AutoCruiseButton, NormalCruiseButton, PursuitButton;
+    private SpeechRecognizer speechRecognizer;
+    public static final Integer RecordAudioRequestCode = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+            checkPermission();
+        }
 
-        /**if (!Python.isStarted()) {
-            Python.start(new AndroidPlatform(this));
-        }*/
 
         AirButton = (ImageButton) findViewById(R.id.air);
         OilButton = (ImageButton) findViewById(R.id.oil);
@@ -65,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         final MediaPlayer beep4 = MediaPlayer.create(this, R.raw.beep4);
         final MediaPlayer mp = new MediaPlayer();
 
+        final Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
 
         AirButton.setOnClickListener(new View.OnClickListener() {
@@ -123,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 stopAndPlay(R.raw.were_only_human, mp);
             }
         });
-        AutoCruiseButton.setOnClickListener(new View.OnClickListener(){
+        /**AutoCruiseButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 beep1.start();
@@ -132,45 +145,106 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.ENGLISH);
                 startActivityForResult(intent, 10);
             }
-        });
+        });*/
         NormalCruiseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beep2.start();
+                stopAndPlay(R.raw.beep2, mp);
             }
         });
         PursuitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beep3.start();
+                stopAndPlay(R.raw.beep3, mp);
+            }
+        });
+
+        AutoCruiseButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP){
+                    speechRecognizer.stopListening();
+                }
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){
+                    stopAndPlay(R.raw.beep1, mp);
+                    AutoCruiseButton.setAlpha(1f);
+                    NormalCruiseButton.setAlpha(0.5f);
+                    PursuitButton.setAlpha(0.5f);
+                    speechRecognizer.startListening(speechRecognizerIntent);
+                }
+                return false;
+            }
+        });
+
+
+//*******************
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+            }
+
+            @Override
+            public void onRmsChanged(float v) {
+
+            }
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+
+            }
+
+            @Override
+            public void onError(int i) {
+
+            }
+
+            @Override
+            public void onResults(Bundle bundle) {
+                AutoCruiseButton.setImageResource(R.drawable.normal_cruise_button);
+                boolean commandHeard =getCommandFromResult(bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION));
+
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {
+
             }
         });
     }
 
-//VOICE RECOGNITION
+ //VOICE RECOGNITION
+
+
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onDestroy() {
+        super.onDestroy();
+        speechRecognizer.destroy();
+    }
 
-        if (resultCode == RESULT_OK && data != null) {
-            switch (requestCode) {
-                case 10:
-                    boolean commandHeard =getCommandFromResult(data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
-                    if(commandHeard){
-                        break;
-                    }
-                    else{
-                        Toast.makeText(getApplicationContext(), "Sorry, I didn't catch that! Please try again", Toast.LENGTH_LONG).show();
-                    }
-            }
-        } else {
-            Toast.makeText(getApplicationContext(), "Failed to recognize speech!", Toast.LENGTH_LONG).show();
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
         }
-
     }
 
 
+//**************************************************
     // method to loop through results trying to find an operator
     private boolean getCommandFromResult(ArrayList<String> results) {
         boolean commandHeard = false;
@@ -194,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     //Code below (stopAndPlay method) written by UdeshUK on StackOverflow:
     //https://stackoverflow.com/questions/48054515/how-to-stop-playing-sounds-on-button-click-to-start-another-sound-file/48054638#48054638
-    private void stopAndPlay(int rawId, MediaPlayer mediaPlayer) {
+    private boolean stopAndPlay(int rawId, MediaPlayer mediaPlayer) {
         mediaPlayer.reset();
         AssetFileDescriptor afd = this.getResources().openRawResourceFd(rawId);
         try {
@@ -204,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             e.printStackTrace();
         }
         mediaPlayer.start();
+        return true;
     }
     @Override
     public boolean onTouch(View v, MotionEvent event) {
