@@ -4,12 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,10 +19,13 @@ import android.content.res.AssetFileDescriptor;
 import java.io.IOException;
 import android.media.MediaPlayer;
 import android.content.Intent;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Locale;
-
 import static android.speech.RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS;
+import static android.speech.SpeechRecognizer.ERROR_NO_MATCH;
+import static android.speech.SpeechRecognizer.ERROR_SPEECH_TIMEOUT;
 //import com.chaquo.python.*;
 //import com.chaquo.python.android.AndroidPlatform;
 
@@ -29,6 +34,7 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
     ImageButton AirButton, OilButton, S1Button, S2Button, P1Button, P2Button, P3Button, P4Button, AutoCruiseButton, NormalCruiseButton, PursuitButton;
     private SpeechRecognizer speechRecognizer;
     public static final Integer RecordAudioRequestCode = 1;
+    private boolean isListening;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,16 +161,15 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
 
         AutoCruiseButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)/**view, MotionEvent motionEvent)*/ {
-                /**if (motionEvent.getAction() == MotionEvent.ACTION_UP){
-                    speechRecognizer.stopListening();
-                }
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN){*/
+            public void onClick(View v){
+                if(!isListening) {
+                    isListening=true;
                     stopAndPlay(R.raw.beep1, mp);
                     AutoCruiseButton.setAlpha(1f);
                     NormalCruiseButton.setAlpha(0.5f);
                     PursuitButton.setAlpha(0.5f);
                     speechRecognizer.startListening(speechRecognizerIntent);
+                }
             }
          });
 
@@ -193,6 +198,17 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
 
             @Override
             public void onError(int i) {
+                /*Context context = getApplicationContext();
+                CharSequence text = ("error: " +i);
+                int duration = Toast.LENGTH_LONG;
+                Toast.makeText(context, text, duration).show();*/
+                if(i == ERROR_NO_MATCH){
+                    stopAndPlay(R.raw.unfortunately_response_delayed,mp);
+                    PursuitButton.setAlpha(0.5f);
+                    AutoCruiseButton.setAlpha(0.5f);
+                    NormalCruiseButton.setAlpha(1f);
+                }
+                isListening=false;
             }
 
             @Override
@@ -219,22 +235,12 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         speechRecognizer.destroy();
     }
 
-//This won't work, need to figure out how to control what happens when error is thrown
-    public void onError(int error){
-        switch(error){
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                PursuitButton.setAlpha(0.5f);
-                AutoCruiseButton.setAlpha(0.5f);
-                NormalCruiseButton.setAlpha(1f);
-        }
-    }
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},RecordAudioRequestCode);
         }
     }
-
 
 //**************************************************
     // method to loop through results trying to find response
@@ -246,7 +252,8 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         return commandHeard;
     }
     //Playing corresponding mp3
-    private boolean getCommandFromText(String strCommand, Intent speechRecognizerIntent) {
+    private boolean getCommandFromText(String strCommand, Intent speechRecognizerIntent){
+
         final MediaPlayer mp = new MediaPlayer();
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -274,6 +281,10 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
             PursuitButton.setAlpha(0.5f);
             AutoCruiseButton.setAlpha(0.5f);
             NormalCruiseButton.setAlpha(1f);
+            isListening=false;
+        }
+        else{
+            stopAndPlay(R.raw.what_can_i_do,mp);
         }
         return false;
     }
