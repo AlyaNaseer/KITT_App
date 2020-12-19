@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
     public static final Integer RecordAudioRequestCode = 1;
     private boolean isListening;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,20 +60,6 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         NormalCruiseButton = (ImageButton) findViewById(R.id.normal);
         PursuitButton = (ImageButton) findViewById(R.id.pursuit);
 
-        /**
-         * Is this needed?
-        AirButton.setOnTouchListener(this);
-        OilButton.setOnTouchListener(this);
-        S1Button.setOnTouchListener(this);
-        S2Button.setOnTouchListener(this);
-        P1Button.setOnTouchListener(this);
-        P2Button.setOnTouchListener(this);
-        P3Button.setOnTouchListener(this);
-        P4Button.setOnTouchListener(this);
-        AutoCruiseButton.setOnTouchListener(this);
-        NormalCruiseButton.setOnTouchListener(this);
-        PursuitButton.setOnTouchListener(this);*/
-
         AutoCruiseButton.setAlpha(0.5f);
         NormalCruiseButton.setAlpha(1f);
         PursuitButton.setAlpha(0.5f);
@@ -93,54 +81,63 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         AirButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep1, R.raw.kitt_intro, mp);
             }
         });
         OilButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep2, R.raw.a_little_consideration_would_be_a_beginning, mp);
             }
         });
         S1Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep1, R.raw.anything_you_can_think_of_perform, mp);
             }
         });
         S2Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep2, R.raw.goodnight, mp);
             }
         });
         P1Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep4, R.raw.i_deal_solely_empirical_data, mp);
             }
         });
         P2Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep3, R.raw.i_dont_know_what_id_do_without_you, mp);
             }
         });
         P3Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep4, R.raw.if_it_werent_for_me_youd_be_walking, mp);
             }
         });
         P4Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 stopListening(beep3, R.raw.were_only_human, mp);
             }
         });
         NormalCruiseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 AutoCruiseButton.setAlpha(0.5f);
                 NormalCruiseButton.setAlpha(1f);
                 PursuitButton.setAlpha(0.5f);
@@ -151,6 +148,7 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         PursuitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                unmute();
                 AutoCruiseButton.setAlpha(0.5f);
                 NormalCruiseButton.setAlpha(0.5f);
                 PursuitButton.setAlpha(1f);
@@ -164,11 +162,13 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
             public void onClick(View v){
                 if(!isListening) {
                     isListening=true;
+                    unmute();
                     stopAndPlay(R.raw.beep1, mp);
                     AutoCruiseButton.setAlpha(1f);
                     NormalCruiseButton.setAlpha(0.5f);
                     PursuitButton.setAlpha(0.5f);
                     speechRecognizer.startListening(speechRecognizerIntent);
+                    mute();//beep of button doesn't work
                 }
             }
          });
@@ -198,10 +198,7 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
 
             @Override
             public void onError(int i) {
-                /*Context context = getApplicationContext();
-                CharSequence text = ("error: " +i);
-                int duration = Toast.LENGTH_LONG;
-                Toast.makeText(context, text, duration).show();*/
+                unmute();
                 if(i == ERROR_NO_MATCH){
                     stopAndPlay(R.raw.unfortunately_response_delayed,mp);
                     PursuitButton.setAlpha(0.5f);
@@ -213,6 +210,7 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
 
             @Override
             public void onResults(Bundle bundle) {
+                unmute();
                 boolean commandHeard = true;
                 while(commandHeard)
                     commandHeard=getCommandFromResult(bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION), speechRecognizerIntent);
@@ -253,7 +251,6 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
     }
     //Playing corresponding mp3
     private boolean getCommandFromText(String strCommand, Intent speechRecognizerIntent){
-
         final MediaPlayer mp = new MediaPlayer();
         mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -271,17 +268,12 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
             stopAndPlay(R.raw.how_would_i_know, mp);
         }
         else if(strCommand.contains("good night")){
-            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    speechRecognizer.stopListening();
-                }
-            });
+            exitSpeechRecognition(isListening, mp);
             stopAndPlay(R.raw.goodnight,mp);
-            PursuitButton.setAlpha(0.5f);
-            AutoCruiseButton.setAlpha(0.5f);
-            NormalCruiseButton.setAlpha(1f);
-            isListening=false;
+        }
+        else if(strCommand.contains("stop") || strCommand.contains("never mind")){
+            exitSpeechRecognition(isListening, mp);
+            stopAndPlay(R.raw.ok, mp);
         }
         else{
             stopAndPlay(R.raw.what_can_i_do,mp);
@@ -289,6 +281,18 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         return false;
     }
 
+    private void exitSpeechRecognition(Boolean isListening, MediaPlayer mp){
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                speechRecognizer.stopListening();
+            }
+        });
+        PursuitButton.setAlpha(0.5f);
+        AutoCruiseButton.setAlpha(0.5f);
+        NormalCruiseButton.setAlpha(1f);
+        isListening=false;
+    }
     private void stopListening(MediaPlayer beep, int mp3, MediaPlayer mp){
         speechRecognizer.stopListening();
         AutoCruiseButton.setAlpha(0.5f);
@@ -311,6 +315,23 @@ public class MainActivity extends AppCompatActivity {/*implements View.OnTouchLi
         }
         mediaPlayer.start();
         return true;
+    }
+
+    private void mute(){
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        amanager.setStreamMute(AudioManager.STREAM_RING, true);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+    }
+    private void unmute(){
+        AudioManager amanager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        amanager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        amanager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        amanager.setStreamMute(AudioManager.STREAM_RING, false);
+        amanager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
 }
 
